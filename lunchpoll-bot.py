@@ -127,6 +127,10 @@ def close_poll():
             joined = ", ".join(top_places)
             result_text = f"⏱️ 투표 종료!\n동률입니다! 다음 중 한 곳에서 식사하면 좋을 것 같아요: *{joined}* (각 {max_votes}표)"
 
+    print("🧾 투표 결과:", dict(vote_counts))
+    print("🏆 최고 득표 수:", max_votes)
+    print("🎯 동률 항목:", top_places)
+
     bolt_app.client.chat_postMessage(
         channel=current_poll["channel_id"],
         text=result_text
