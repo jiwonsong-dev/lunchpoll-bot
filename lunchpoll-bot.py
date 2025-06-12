@@ -136,8 +136,20 @@ import re
 @bolt_app.action(re.compile("vote_.*"))
 def handle_vote(ack, body, respond):
     ack()
+
     user_id = body["user"]["id"]
     value = body["actions"][0]["value"]
+    message_ts = body.get("message", {}).get("ts")
+    channel_id = body.get("channel", {}).get("id")
+
+    # 로그 출력
+    print("🔔 버튼 클릭 감지:")
+    print(f"  👤 유저 ID: {user_id}")
+    print(f"  ✅ 선택한 값: {value}")
+    print(f"  💬 메시지 ts: {message_ts}")
+    print(f"  📡 채널 ID: {channel_id}")
+    print("  🧾 전체 body:")
+    pprint.pprint(body)
 
     if not current_poll["active"]:
         respond("이미 종료된 설문입니다.")
