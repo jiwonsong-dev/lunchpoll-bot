@@ -27,16 +27,51 @@ current_poll = {
 def send_poll(poll_type="lunch"):
     if poll_type == "lunch":
         options = [
-            {"text": {"type": "plain_text", "text": "300동"}, "value": "300동", "action_id": "vote_300"},
-            {"text": {"type": "plain_text", "text": "301동"}, "value": "301동", "action_id": "vote_301"},
-            {"text": {"type": "plain_text", "text": "302동"}, "value": "302동", "action_id": "vote_302"},
-            {"text": {"type": "plain_text", "text": "안먹음"}, "value": "안먹음", "action_id": "vote_none"},
+            {
+                "type": "button",
+                "text": {"type": "plain_text", "text": "300동"},
+                "value": "300동",
+                "action_id": "vote_300"
+            },
+            {
+                "type": "button",
+                "text": {"type": "plain_text", "text": "301동"},
+                "value": "301동",
+                "action_id": "vote_301"
+            },
+            {
+                "type": "button",
+                "text": {"type": "plain_text", "text": "302동"},
+                "value": "302동",
+                "action_id": "vote_302"
+            },
+            {
+                "type": "button",
+                "text": {"type": "plain_text", "text": "안먹음"},
+                "value": "안먹음",
+                "action_id": "vote_none"
+            }
         ]
     else:  # dinner
         options = [
-            {"text": {"type": "plain_text", "text": "300동"}, "value": "300동", "action_id": "vote_300"},
-            {"text": {"type": "plain_text", "text": "302동"}, "value": "302동", "action_id": "vote_302"},
-            {"text": {"type": "plain_text", "text": "안먹음"}, "value": "안먹음", "action_id": "vote_none"},
+            {
+                "type": "button",
+                "text": {"type": "plain_text", "text": "300동"},
+                "value": "300동",
+                "action_id": "vote_300"
+            },
+            {
+                "type": "button",
+                "text": {"type": "plain_text", "text": "302동"},
+                "value": "302동",
+                "action_id": "vote_302"
+            },
+            {
+                "type": "button",
+                "text": {"type": "plain_text", "text": "안먹음"},
+                "value": "안먹음",
+                "action_id": "vote_none"
+            }
         ]
 
     resp = bolt_app.client.chat_postMessage(

@@ -4,9 +4,9 @@ A Slack bot that automatically runs a lunch/dinner poll for SNU VLSI Lab.
 
 ## 🍱 Features
 - Automatically sends a poll to your Slack channel at:
-  - 🕚 11:30 AM (Lunch)
-  - 🕔 5:30 PM (Dinner)
-- Voting options: `300동`, `301동`, `302동`, `안먹음`
+  - 🕚 11:20 AM (Lunch)
+  - 🕔 5:20 PM (Dinner)
+- Voting options: `300동`, `301동`, `302동`, `안먹음` (301동은 저녁에는 제외)
 - Automatically closes the poll after 10 minutes and announces the result
 
 ## 🚀 How to Deploy (Render)
