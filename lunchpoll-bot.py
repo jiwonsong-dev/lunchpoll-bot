@@ -59,7 +59,7 @@ def close_poll():
         text=result
     )
 
-@bolt_app.action("vote_option")
+@bolt_app.action("vote_.*")
 def handle_vote(ack, body, respond):
     ack()
     uid = body["user"]["id"]
