@@ -78,8 +78,8 @@ def slack_events():
     return handler.handle(request)
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(send_poll, "cron", hour=11, minute=30)
-scheduler.add_job(send_poll, "cron", hour=17, minute=30)
+scheduler.add_job(send_poll, "cron", hour=11, minute=20, day_of_week='mon-fri')
+scheduler.add_job(send_poll, "cron", hour=17, minute=20, day_of_week='mon-fri')
 scheduler.start()
 
 if __name__ == "__main__":
