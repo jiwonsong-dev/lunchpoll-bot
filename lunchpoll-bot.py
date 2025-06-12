@@ -135,33 +135,36 @@ def close_poll():
 import re
 
 @bolt_app.action(re.compile("vote_.*"))
-def handle_vote(ack, body, respond):
+def handle_vote(ack, body, client):
     ack()
 
     user_id = body["user"]["id"]
     value = body["actions"][0]["value"]
-    message_ts = body.get("message", {}).get("ts")
-    channel_id = body.get("channel", {}).get("id")
-
-    # 로그 출력
-    print("🔔 버튼 클릭 감지:")
-    print(f"  👤 유저 ID: {user_id}")
-    print(f"  ✅ 선택한 값: {value}")
-    print(f"  💬 메시지 ts: {message_ts}")
-    print(f"  📡 채널 ID: {channel_id}")
-    print("  🧾 전체 body:")
-    pprint.pprint(body)
+    channel_id = body["channel"]["id"]
 
     if not current_poll["active"]:
-        respond("이미 종료된 설문입니다.")
+        client.chat_postEphemeral(
+            channel=channel_id,
+            user=user_id,
+            text="이미 종료된 설문입니다."
+        )
         return
 
     if user_id in current_poll["votes"]:
-        respond("이미 투표하셨습니다.")
+        client.chat_postEphemeral(
+            channel=channel_id,
+            user=user_id,
+            text="이미 투표하셨습니다."
+        )
         return
 
     current_poll["votes"][user_id] = value
-    respond(f"<@{user_id}>님이 *{value}*에 투표하셨습니다!")
+
+    client.chat_postEphemeral(
+        channel=channel_id,
+        user=user_id,
+        text=f"<@{user_id}>님이 *{value}*에 투표하셨습니다!"
+    )
 
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
@@ -174,7 +177,7 @@ def health_check():
 scheduler = BackgroundScheduler()
 scheduler.add_job(lambda: send_poll("lunch"), "cron", hour=2, minute=20, day_of_week='mon-fri')
 scheduler.add_job(lambda: send_poll("dinner"), "cron", hour=8, minute=20, day_of_week='mon-fri')
-scheduler.add_job(lambda: send_poll("dinner"), "cron", hour=11, minute=53, day_of_week='mon-fri')
+scheduler.add_job(lambda: send_poll("dinner"), "cron", hour=11, minute=59, day_of_week='mon-fri')
 scheduler.start()
 
 if __name__ == "__main__":
