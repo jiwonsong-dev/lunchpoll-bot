@@ -30,10 +30,10 @@ def send_poll():
         blocks=[
             {"type": "section", "text": {"type": "mrkdwn", "text": "*🍴 오늘 어디서 먹을까요?*"}},
             {"type": "actions", "elements": [
-                {"type": "button", "text": {"type": "plain_text", "text": "300동"}, "value": "300동", "action_id": "vote_option"},
-                {"type": "button", "text": {"type": "plain_text", "text": "301동"}, "value": "301동", "action_id": "vote_option"},
-                {"type": "button", "text": {"type": "plain_text", "text": "302동"}, "value": "302동", "action_id": "vote_option"},
-                {"type": "button", "text": {"type": "plain_text", "text": "안먹음"}, "value": "안먹음", "action_id": "vote_option"}
+                {"type": "button", "text": {"type": "plain_text", "text": "300동"}, "value": "300동", "action_id": "vote_300"},
+                {"type": "button", "text": {"type": "plain_text", "text": "301동"}, "value": "301동", "action_id": "vote_301"},
+                {"type": "button", "text": {"type": "plain_text", "text": "302동"}, "value": "302동", "action_id": "vote_302"},
+                {"type": "button", "text": {"type": "plain_text", "text": "안먹음"}, "value": "안먹음", "action_id": "vote_none"}
             ]}
         ]
     )
