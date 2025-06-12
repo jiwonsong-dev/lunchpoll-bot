@@ -59,27 +59,36 @@ def close_poll():
         text=result
     )
 
-@bolt_app.action("vote_.*")
+import re
+
+@bolt_app.action(re.compile("vote_.*"))
 def handle_vote(ack, body, respond):
     ack()
-    uid = body["user"]["id"]
-    val = body["actions"][0]["value"]
+    user_id = body["user"]["id"]
+    value = body["actions"][0]["value"]
+
     if not current_poll["active"]:
         respond("이미 종료된 설문입니다.")
         return
-    if uid in current_poll["votes"]:
+
+    if user_id in current_poll["votes"]:
         respond("이미 투표하셨습니다.")
         return
-    current_poll["votes"][uid] = val
-    respond(f"<@{uid}>님이 *{val}*에 투표하셨습니다!")
+
+    current_poll["votes"][user_id] = value
+    respond(f"<@{user_id}>님이 *{value}*에 투표하셨습니다!")
 
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
     return handler.handle(request)
 
+@flask_app.route("/", methods=["GET"])
+def health_check():
+    return "lunchpoll-bot is running", 200
+
 scheduler = BackgroundScheduler()
 scheduler.add_job(send_poll, "cron", hour=2, minute=20, day_of_week='mon-fri') # UTC+9
-scheduler.add_job(send_poll, "cron", hour=10, minute=45, day_of_week='mon-fri') # UTC+9
+scheduler.add_job(send_poll, "cron", hour=10, minute=53, day_of_week='mon-fri') # UTC+9
 scheduler.start()
 
 if __name__ == "__main__":
