@@ -1,4 +1,5 @@
 import os
+import pprint
 from flask import Flask, request
 from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
@@ -173,7 +174,7 @@ def health_check():
 scheduler = BackgroundScheduler()
 scheduler.add_job(lambda: send_poll("lunch"), "cron", hour=2, minute=20, day_of_week='mon-fri')
 scheduler.add_job(lambda: send_poll("dinner"), "cron", hour=8, minute=20, day_of_week='mon-fri')
-scheduler.add_job(lambda: send_poll("dinner"), "cron", hour=11, minute=50, day_of_week='mon-fri')
+scheduler.add_job(lambda: send_poll("dinner"), "cron", hour=11, minute=53, day_of_week='mon-fri')
 scheduler.start()
 
 if __name__ == "__main__":
