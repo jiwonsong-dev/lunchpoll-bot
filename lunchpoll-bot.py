@@ -23,40 +23,77 @@ current_poll = {
     "channel_id": None
 }
 
-def send_poll():
+
+def send_poll(poll_type="lunch"):
+    if poll_type == "lunch":
+        options = [
+            {"text": {"type": "plain_text", "text": "300동"}, "value": "300동", "action_id": "vote_300"},
+            {"text": {"type": "plain_text", "text": "301동"}, "value": "301동", "action_id": "vote_301"},
+            {"text": {"type": "plain_text", "text": "302동"}, "value": "302동", "action_id": "vote_302"},
+            {"text": {"type": "plain_text", "text": "안먹음"}, "value": "안먹음", "action_id": "vote_none"},
+        ]
+    else:  # dinner
+        options = [
+            {"text": {"type": "plain_text", "text": "300동"}, "value": "300동", "action_id": "vote_300"},
+            {"text": {"type": "plain_text", "text": "302동"}, "value": "302동", "action_id": "vote_302"},
+            {"text": {"type": "plain_text", "text": "안먹음"}, "value": "안먹음", "action_id": "vote_none"},
+        ]
+
     resp = bolt_app.client.chat_postMessage(
         channel=CHANNEL_ID,
         text="🍴 오늘 어디서 먹을까요?",
         blocks=[
-            {"type": "section", "text": {"type": "mrkdwn", "text": "*🍴 오늘 어디서 먹을까요?*"}},
-            {"type": "actions", "elements": [
-                {"type": "button", "text": {"type": "plain_text", "text": "300동"}, "value": "300동", "action_id": "vote_300"},
-                {"type": "button", "text": {"type": "plain_text", "text": "301동"}, "value": "301동", "action_id": "vote_301"},
-                {"type": "button", "text": {"type": "plain_text", "text": "302동"}, "value": "302동", "action_id": "vote_302"},
-                {"type": "button", "text": {"type": "plain_text", "text": "안먹음"}, "value": "안먹음", "action_id": "vote_none"}
-            ]}
+            {
+                "type": "section",
+                "text": {"type": "mrkdwn", "text": "*🍴 오늘 어디서 먹을까요?*"}
+            },
+            {
+                "type": "actions",
+                "elements": options
+            }
         ]
     )
+
     current_poll["votes"].clear()
     current_poll["active"] = True
     current_poll["message_ts"] = resp["ts"]
     current_poll["channel_id"] = resp["channel"]
+
     Timer(600, close_poll).start()
+    Timer(420, send_warning_message).start()
+
+
+def send_warning_message():
+    if not current_poll["active"]:
+        return
+    bolt_app.client.chat_postMessage(
+        channel=current_poll["channel_id"],
+        #thread_ts=current_poll["message_ts"],
+        text="⏳ 3분 남았습니다! 아직 투표 안 하셨다면 지금 눌러주세요 🙌"
+    )
 
 def close_poll():
     current_poll["active"] = False
-    counts = defaultdict(int)
-    for v in current_poll["votes"].values():
-        counts[v] += 1
-    if not counts:
-        result = "아무도 투표하지 않았습니다... 😢"
+    vote_counts = defaultdict(int)
+    for vote in current_poll["votes"].values():
+        vote_counts[vote] += 1
+
+    if not vote_counts:
+        result_text = "아무도 투표하지 않았습니다... 😢"
     else:
-        top, cnt = sorted(counts.items(), key=lambda x: (-x[1], x[0]))[0]
-        result = f"⏱️ 투표 종료!\n오늘은 *{top}*에서 {cnt}명이 식사합니다! 🍽️"
+        # 최고 득표 수 찾기
+        max_votes = max(vote_counts.values())
+        top_places = [place for place, count in vote_counts.items() if count == max_votes]
+
+        if len(top_places) == 1:
+            result_text = f"⏱️ 투표 종료!\n오늘은 *{top_places[0]}*에서 식사합니다! 🍽️"
+        else:
+            joined = ", ".join(top_places)
+            result_text = f"⏱️ 투표 종료!\n동률입니다! 다음 중 한 곳에서 식사하면 좋을 것 같아요: *{joined}* (각 {max_votes}표)"
+
     bolt_app.client.chat_postMessage(
         channel=current_poll["channel_id"],
-        thread_ts=current_poll["message_ts"],
-        text=result
+        text=result_text
     )
 
 import re
@@ -87,8 +124,9 @@ def health_check():
     return "lunchpoll-bot is running", 200
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(send_poll, "cron", hour=2, minute=20, day_of_week='mon-fri') # UTC+9
-scheduler.add_job(send_poll, "cron", hour=10, minute=53, day_of_week='mon-fri') # UTC+9
+scheduler.add_job(lambda: send_poll("lunch"), "cron", hour=2, minute=20, day_of_week='mon-fri')
+scheduler.add_job(lambda: send_poll("dinner"), "cron", hour=8, minute=20, day_of_week='mon-fri')
+scheduler.add_job(lambda: send_poll("dinner"), "cron", hour=11, minute=13, day_of_week='mon-fri')
 scheduler.start()
 
 if __name__ == "__main__":
